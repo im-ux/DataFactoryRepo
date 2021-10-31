@@ -1,0 +1,35 @@
+{
+	"name": "AlterRawTransformation",
+	"properties": {
+		"folder": {
+			"name": "MultipleStream"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_Colors",
+						"type": "DatasetReference"
+					},
+					"name": "AlterRawSource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ColorDestination",
+						"type": "DatasetReference"
+					},
+					"name": "AlterRawSink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "UpsertIfOnColorNameUpdateAll"
+				}
+			],
+			"script": "source(output(\n\t\tColorID as integer,\n\t\tColorName as string,\n\t\tLastEditedBy as integer,\n\t\tValidFrom as timestamp,\n\t\tValidTo as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> AlterRawSource\nAlterRawSource alterRow(upsertIf(true())) ~> UpsertIfOnColorNameUpdateAll\nUpsertIfOnColorNameUpdateAll sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['ColorName'],\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1,\n\terrorHandlingOption: 'stopOnFirstError') ~> AlterRawSink"
+		}
+	}
+}

@@ -1,0 +1,31 @@
+{
+	"name": "AggregateTransformation",
+	"properties": {
+		"folder": {
+			"name": "MultipleStream"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DB_Source_Employee",
+						"type": "DatasetReference"
+					},
+					"name": "AggregateSource"
+				}
+			],
+			"sinks": [
+				{
+					"name": "Destination"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AggregateTransaformation"
+				}
+			],
+			"script": "source(output(\n\t\tBusinessEntityID as integer,\n\t\tNationalIDNumber as string,\n\t\tLoginID as string,\n\t\tOrganizationNode as binary,\n\t\tOrganizationLevel as integer,\n\t\tJobTitle as string,\n\t\tBirthDate as date,\n\t\tMaritalStatus as string,\n\t\tGender as string,\n\t\tHireDate as date,\n\t\tSalariedFlag as boolean,\n\t\tVacationHours as integer,\n\t\tSickLeaveHours as integer,\n\t\tCurrentFlag as boolean,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> AggregateSource\nAggregateSource aggregate(groupBy(JobTitle),\n\tMinAge = min(BirthDate),\n\t\tMaxAge = max(BirthDate)) ~> AggregateTransaformation\nAggregateTransaformation sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tstore: 'cache',\n\tformat: 'inline',\n\toutput: false,\n\tsaveOrder: 1) ~> Destination"
+		}
+	}
+}

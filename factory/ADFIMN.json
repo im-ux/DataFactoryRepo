@@ -1,0 +1,9 @@
+{
+	"name": "ADFIMN",
+	"location": "westus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "3a229e03-2641-426c-8a9b-81f9edf8f691",
+		"tenantId": "a7499e28-6a7f-48d9-8b14-d3e690989660"
+	}
+}

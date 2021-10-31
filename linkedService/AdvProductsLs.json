@@ -1,0 +1,12 @@
+{
+	"name": "AdvProductsLs",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": "integrated security=False;encrypt=True;connection timeout=30;data source=imansplayserver.database.windows.net;initial catalog=AdventureWorks2019;user id=imanyu",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkFERklNTl9hNWU1M2U5ZS1iMmRkLTQ2N2QtYWQ2Yi03Yjg1MDE2ZjU4ZTMiDQp9"
+		}
+	}
+}

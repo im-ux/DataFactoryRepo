@@ -1,0 +1,17 @@
+{
+	"name": "ColorDestination",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "MergeDBLs",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "ColorImport"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
