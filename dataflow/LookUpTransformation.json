@@ -1,0 +1,44 @@
+{
+	"name": "LookUpTransformation",
+	"properties": {
+		"folder": {
+			"name": "MultipleStream"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_LookUp",
+						"type": "DatasetReference"
+					},
+					"name": "ItemSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_Colors",
+						"type": "DatasetReference"
+					},
+					"name": "Colorsource"
+				}
+			],
+			"sinks": [
+				{
+					"name": "CasheDetination"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectColumns"
+				},
+				{
+					"name": "LookupColorID"
+				},
+				{
+					"name": "SelectValidColumnsAddColorName"
+				}
+			],
+			"script": "source(output(\n\t\tStockItemID as integer,\n\t\tStockItemName as string,\n\t\tSupplierID as integer,\n\t\tColorID as integer,\n\t\tUnitPackageID as integer,\n\t\tOuterPackageID as integer,\n\t\tBrand as string,\n\t\tSize as string,\n\t\tLeadTimeDays as integer,\n\t\tQuantityPerOuter as integer,\n\t\tIsChillerStock as boolean,\n\t\tBarcode as string,\n\t\tTaxRate as decimal(18,3),\n\t\tUnitPrice as decimal(18,2),\n\t\tRecommendedRetailPrice as decimal(18,2),\n\t\tTypicalWeightPerUnit as decimal(18,3),\n\t\tMarketingComments as string,\n\t\tInternalComments as string,\n\t\tPhoto as binary,\n\t\tCustomFields as string,\n\t\tTags as string,\n\t\tSearchDetails as string,\n\t\tLastEditedBy as integer,\n\t\tValidFrom as timestamp,\n\t\tValidTo as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ItemSource\nsource(output(\n\t\tColorID as integer,\n\t\tColorName as string,\n\t\tLastEditedBy as integer,\n\t\tValidFrom as timestamp,\n\t\tValidTo as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Colorsource\nItemSource select(mapColumn(\n\t\tStockItemID,\n\t\tStockItemName,\n\t\tSupplierID,\n\t\tColorID,\n\t\tUnitPackageID,\n\t\tOuterPackageID,\n\t\tBrand,\n\t\tSize,\n\t\tLeadTimeDays,\n\t\tQuantityPerOuter,\n\t\tIsChillerStock,\n\t\tBarcode,\n\t\tTaxRate,\n\t\tUnitPrice,\n\t\tRecommendedRetailPrice,\n\t\tTypicalWeightPerUnit,\n\t\tMarketingComments,\n\t\tInternalComments,\n\t\tPhoto,\n\t\tCustomFields,\n\t\tTags,\n\t\tSearchDetails,\n\t\tLastEditedBy,\n\t\tValidFrom,\n\t\tValidTo\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nSelectColumns, Colorsource lookup(SelectColumns@ColorID == Colorsource@ColorID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupColorID\nLookupColorID select(mapColumn(\n\t\tStockItemID,\n\t\tStockItemName,\n\t\tSupplierID,\n\t\tColorID = SelectColumns@ColorID,\n\t\tUnitPackageID,\n\t\tOuterPackageID,\n\t\tBrand,\n\t\tSize,\n\t\tLeadTimeDays,\n\t\tQuantityPerOuter,\n\t\tIsChillerStock,\n\t\tBarcode,\n\t\tTaxRate,\n\t\tUnitPrice,\n\t\tRecommendedRetailPrice,\n\t\tTypicalWeightPerUnit,\n\t\tMarketingComments,\n\t\tColorID = Colorsource@ColorID,\n\t\tColorName\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectValidColumnsAddColorName\nSelectValidColumnsAddColorName sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tstore: 'cache',\n\tformat: 'inline',\n\toutput: false,\n\tsaveOrder: 1) ~> CasheDetination"
+		}
+	}
+}

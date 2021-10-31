@@ -1,0 +1,31 @@
+{
+	"name": "SurrogateKayTransformation",
+	"properties": {
+		"folder": {
+			"name": "MultipleStream"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Address",
+						"type": "DatasetReference"
+					},
+					"name": "SurrogateSource"
+				}
+			],
+			"sinks": [
+				{
+					"name": "CasheDestination"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SurrogateKey"
+				}
+			],
+			"script": "source(output(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tStateProvinceID as integer,\n\t\tPostalCode as string,\n\t\tSpatialLocation as binary,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SurrogateSource\nSurrogateSource keyGenerate(output(Id as long),\n\tstartAt: 1L) ~> SurrogateKey\nSurrogateKey sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tstore: 'cache',\n\tformat: 'inline',\n\toutput: false,\n\tsaveOrder: 1) ~> CasheDestination"
+		}
+	}
+}

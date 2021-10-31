@@ -1,0 +1,35 @@
+{
+	"name": "Rank2",
+	"properties": {
+		"folder": {
+			"name": "MultipleStream"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DB_Source_Employee",
+						"type": "DatasetReference"
+					},
+					"name": "RankSource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "RankBySickLeave",
+						"type": "DatasetReference"
+					},
+					"name": "BlobSync"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Rank"
+				}
+			],
+			"script": "source(output(\n\t\tBusinessEntityID as integer,\n\t\tNationalIDNumber as string,\n\t\tLoginID as string,\n\t\tOrganizationNode as binary,\n\t\tOrganizationLevel as integer,\n\t\tJobTitle as string,\n\t\tBirthDate as date,\n\t\tMaritalStatus as string,\n\t\tGender as string,\n\t\tHireDate as date,\n\t\tSalariedFlag as boolean,\n\t\tVacationHours as integer,\n\t\tSickLeaveHours as integer,\n\t\tCurrentFlag as boolean,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> RankSource\nRankSource rank(desc(SickLeaveHours, true),\n\toutput(Rank_Column as long),\n\tdense: true) ~> Rank\nRank sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['Rankbyabsence'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> BlobSync"
+		}
+	}
+}
